@@ -1,0 +1,30 @@
+#内嵌tomcat相关属性配置
+server:
+  port: 8002
+  servlet:
+    context-path: /springboot-actuator
+#actuator健康监控配置
+management:
+  server:
+    port: 9001
+    servlet:
+      context-path: /actuator
+  endpoints:
+    web:
+      base-path: /base #默认为 /actuator
+      exposure:
+        include: '*' #actuator默认开放的终端 health 和 info * 通配符需要用 单引号引起来使用 开放所有终端 [beans,env]
+        exclude: [beans,mappings] #exclude 排除某些终端 表示不开启
+#actuator添加info信息
+#自定义info信息
+info.author.name: Aaron
+info.author.email: cao_shuai688@163.com
+info.author.address: 上海
+
+#读取pom.xml中的相应值 使用@符号读取
+info.project.groupId: @project.groupId@
+info.project.artifactId: @project.artifactId@
+info.project.version: @project.version@
+info.project.packaging: @project.packaging@
+
+

@@ -1,0 +1,5 @@
+#修改内嵌tomcat的端口和项目访问根路径
+server:
+  port: 8001
+  servlet:
+    context-path: /springboot
