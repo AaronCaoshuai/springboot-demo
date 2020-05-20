@@ -465,7 +465,91 @@ info.project.packaging: @project.packaging@
 
 ### 自定义异常页面
 
+对于404,405,500等异常状态,服务器会给出默认的异常页面,而这些异常页面一般都是英文的,且非常不友好.可以通过简单的方式使用自定义异常页面,并将默认状态页面进行替换.
+
+静态异常页面
+
+定义目录:src/main/resources 目录下面在定义新的目录/static/error,必须是这个目录名称
+
+或者/public/error也可以. 
+
+定义异常页面:这些异常页面的名称必须为相应的状态码,扩展名为html
+
+动态异常页面
+
+页面模板有jsp,freemarker,thymeleaf.动态异常页面,也支持404.html,或者4xx.html,但是一般来说,由于动态异常页面可以直接展示异常详细信息,所以没有必要挨个枚举错误,直接定义4xx.html或者5xx.html接口
+
+动态页面模板,不需要开发者自己去定义控制器,直接定义异常页面即可,SpringBoot中自带的异常处理器会自动查找到异常页面.
+
+定义目录:src/main/resources 目录下面在定义新的目录/templates/error/4xx.html
+
+需要定义模板解析引擎.
+
+参考: https://www.cnblogs.com/lenve/p/10721409.html 
+
 ### 单元测试
+
+pom中会自动依赖
+
+``` java
+ 	<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+     </dependency>
+```
+
+项目初始化会生成测试相关的类
+
+```java
+package com.aaron;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SpringbootBasicApplicationTests {
+
+
+    @Test
+    public void contextLoads() {
+
+    }
+
+}
+
+```
+
+自定义的测试类可以继承该类,随后依赖注入需要测试的类进行单元测试:
+
+```java
+package com.aaron.service;
+
+import com.aaron.SpringbootBasicApplicationTests;
+import com.aaron.domain.User;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 自定义用户测试
+ */
+public class HelloServiceTest extends SpringbootBasicApplicationTests {
+
+
+    @Autowired
+    private HelloService helloService;
+
+    @Test
+    public void insertUserTest() {
+        helloService.insertUser(new User());
+    }
+
+}
+
+```
 
 ### 多环境选择
 

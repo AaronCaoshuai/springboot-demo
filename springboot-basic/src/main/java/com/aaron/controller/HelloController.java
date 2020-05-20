@@ -12,4 +12,10 @@ public class HelloController {
         return "hello SpringBoot";
     }
 
+    @RequestMapping("/customException")
+    public String customException(){
+        System.out.println(1/0);
+        return "hello SpringBoot";
+    }
+
 }
