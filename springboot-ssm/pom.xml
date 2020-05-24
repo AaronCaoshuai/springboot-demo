@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.2</version>
+            <version>1.3.2</version>
         </dependency>
 
         <dependency>
@@ -36,7 +36,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- druid驱动 -->
+        <!-- druid数据源 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
@@ -56,6 +56,28 @@
     </dependencies>
 
     <build>
+        <!--如果把mapper.xml文件定义在和mapper接口同级的目录下需要进行如下配置,
+        如果放置在resources下面则不需要.要主要扫描包的配置和启动类的扫描注解配置
+        使用resrouces插件会把原来父pom中的引用覆盖需要把yml等其他配置文件也要包含进来
+        -->
+       <!-- <resources>
+            &lt;!&ndash;注册dao包下mybatis映射文件为资源目录&ndash;&gt;
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            &lt;!&ndash;注册webapp目录为资源目录&ndash;&gt;
+           &lt;!&ndash; <resource>
+                <directory>src/main/webapp</directory>
+                <targetPath>META-INF/resources</targetPath>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>&ndash;&gt;
+        </resources>-->
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

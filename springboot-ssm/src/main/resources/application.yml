@@ -2,6 +2,11 @@ spring:
   profiles:
     active: dev
 
-
+#mybatis配置
+mybatis:
+  #注册Mapper文件
+  mapper-locations: classpath:mapper/*.xml
+  #设置别名
+  type-aliases-package: com.aaron.domain
 
 
