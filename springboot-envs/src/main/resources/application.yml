@@ -1,0 +1,28 @@
+#多环境配置实现
+#指定需要执行配置环境 单个配置文件支持 或者分别使用独立配置文件
+spring:
+  profiles:
+    active: prod
+#对于项目访问前缀一般会固定 此处用于展示示例
+#便于前后端交互
+---
+spring:
+  profiles: uat
+server:
+  port: 8002
+  servlet:
+    context-path: /uat
+
+---
+spring:
+  profiles: prod
+server:
+  port: 8003
+  servlet:
+    context-path: /prod
+
+#主文件中自定义配置文件
+app:
+  name: springboot-envs
+  author: Aaron
+
