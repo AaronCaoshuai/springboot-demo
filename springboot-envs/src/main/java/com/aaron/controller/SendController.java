@@ -1,6 +1,7 @@
 package com.aaron.controller;
 
 import com.aaron.config.Student;
+import com.aaron.config.Teacher;
 import com.aaron.service.ProdSendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,9 @@ public class SendController {
     @Autowired
     private Student student;
 
+    @Autowired
+    private Teacher teacher;
+
     @RequestMapping("/msg")
     public String sendMsg(){
         System.out.println("当前环境:"+profileActive+",port:"+port);
@@ -37,6 +41,7 @@ public class SendController {
         sendService.sendMsg();
 
         System.out.println(student);
+        System.out.println(teacher);
         return "success";
     }
 }

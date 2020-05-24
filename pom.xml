@@ -12,5 +12,6 @@
         <module>springboot-basic</module>
         <module>springboot-basic1</module>
         <module>springboot-actuator</module>
+        <module>springboot-envs</module>
     </modules>
 </project>
