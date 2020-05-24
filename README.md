@@ -4,6 +4,8 @@
 
 # SpringBoot相关
 
+中文参考手册： https://www.springcloud.cc/spring-boot.html   五星重要程度
+
 ## SpringBoot基础
 
 ### SpringBoot介绍
@@ -459,8 +461,6 @@ info.project.packaging: @project.packaging@
 
 5.**自定义实现SpringBoot监控的可视化监控**
 
-
-
 ## SpringBoot重要用法
 
 ### 自定义异常页面
@@ -551,11 +551,374 @@ public class HelloServiceTest extends SpringbootBasicApplicationTests {
 
 ```
 
+
+
 ### 多环境选择
 
-### 读取自定义配置
+#### 多环境应用
+
+多环境含义:
+
+1.相同代码运行在不同环境
+
+​	在开发应用时,通常会将同一套代码运行在多个不同环境 ,比如:开发,测试,预发布,生产等环境.不同环境的数据库,服务器端口号等配置都会不同.若不在不同环境下运行时将配置文件修改为不同内容,做饭非常繁琐且容易发生错误.
+
+​	需要定义不同的配置信息,不同环境自动选择不同的配置
+
+2.不同环境执行不同的实现类
+
+​	在开发应用时,有时候不同的环境,需要运行的接口的实现类是不同的.例如,如要开发一个具有发短信的功能,开发环境实际是不需要真正调用运营商的实际发送短信的接口,仅需模拟调用即可.而生产环境要执行的接口是真正需要调用的发送短信的接口.
+
+​	此时需要开发两个相关接口的实现类去实现发送方法,在拜托你个的环境中自动选择不同的实现类去执行.
+
+例子:不同环境使用不同配置文件,不同环境调用不同接口实现类.
+
+1.创建springboot工程
+
+2.定义多个不同环境配置文件
+
+代码示例:
+
+```java
+#多环境配置实现
+#指定需要执行配置环境 单个配置文件支持 或者分别使用独立配置文件
+spring:
+  profiles:
+    active: prod
+#对于项目访问前缀一般会固定 此处用于展示示例
+#便于前后端交互
+---
+spring:
+  profiles: uat
+server:
+  port: 8002
+  servlet:
+    context-path: /uat
+
+---
+spring:
+  profiles: prod
+server:
+  port: 8003
+  servlet:
+    context-path: /prod
+```
+
+```java
+spring:
+  profiles: dev
+server:
+  port: 8001
+  servlet:
+    context-path: /dev
+
+
+```
+
+可以在一个配置文件中通过:--- 进行区分,也可以定义application-{profile}.yml的格式.其中{profile}表示对应的环境标识.对于哪个环境会被加载,则需要在application.yml文件中通过
+
+spring.profiles.active属性来设置.对应profile
+
+使用.properties同理
+
+对于不同环境执行不同的实现类,可以使用 @Profile注解来标识不同环境对应的不同实现类,执行不同的逻辑处理
+
+```java
+package com.aaron.service.impl;
+
+import com.aaron.service.ProdSendService;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+@Service
+@Profile("dev")
+public class DevSendServiceImpl implements ProdSendService {
+
+    @Override
+    public void sendMsg() {
+        System.out.println("开发发送短信成功");
+    }
+}
+
+```
+
+```java
+package com.aaron.service.impl;
+
+import com.aaron.service.ProdSendService;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+@Service
+@Profile("prod")
+public class ProdSendServiceImpl implements ProdSendService {
+
+    @Override
+    public void sendMsg() {
+        System.out.println("生产发送短信成功");
+    }
+}
+
+```
+
+在命令行指定参数也可以使用不同的配置文件进行启动.
+
+java -jar jar包名 --spring.profiles-active=dev
+
+
+
+#### 读取自定义配置
+
+该自定义配置文件为.properties类型.存放在src/main/resources目录下
+
+```java
+#自定义配置文件
+student.name=Aaron
+student.sex=男
+student.age=26
+student.address.country=上海
+student.address.city=浦东新区
+
+```
+
+```java
+package com.aaron.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+
+/**
+ * 自定义配置文件的读取
+ */
+@Component
+@PropertySource(value = "classpath:custom.properties",encoding = "utf-8")
+@ConfigurationProperties("student")
+public class Student {
+
+    private String name;
+
+    private String sex;
+
+    private String age;
+
+    @Autowired
+    private Address address;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", sex='" + sex + '\'' +
+                ", age='" + age + '\'' +
+                ", address=" + address +
+                '}';
+    }
+}
+
+```
+
+```java
+package com.aaron.config;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Address {
+
+    private String country;
+
+    private String city;
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                '}';
+    }
+}
+
+
+```
+
+测试:略
+
+对于自定义的yml文件需要自己创建yml文件的工厂解析器来解析.
+
+还是使用以前的注解@PropertySource和@ConfigurationProperties
+
+```java
+package com.aaron.config;
+
+
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.support.EncodedResource;
+import org.springframework.core.io.support.PropertySourceFactory;
+import org.springframework.stereotype.Component;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
+/**
+ * 定义yml文件解析工厂,指定工厂解析器 用来解析yml
+ */
+@Component
+public class YamlPropertySourceFactory implements PropertySourceFactory {
+    @Override
+    public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
+
+        Properties propertiesFromYaml = loadYamlIntoProperties(resource);
+        String sourceName = name != null ? name : resource.getResource().getFilename();
+        return new PropertiesPropertySource(sourceName, propertiesFromYaml);
+    }
+
+    private Properties loadYamlIntoProperties(EncodedResource resource) throws FileNotFoundException{
+        try {
+            YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+            factory.setResources(resource.getResource());
+            factory.afterPropertiesSet();
+            return factory.getObject();
+         } catch (IllegalStateException e) {
+            // for ignoreResourceNotFound
+             Throwable cause = e.getCause();
+            if (cause instanceof FileNotFoundException)
+                throw (FileNotFoundException) e.getCause();
+            throw e;
+         }
+    }
+}
+
+```
+
+```java
+package com.aaron.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+
+@Component
+@PropertySource(value = "custom1.yml",encoding = "utf-8",factory = YamlPropertySourceFactory.class)
+@ConfigurationProperties("teacher")
+public class Teacher {
+
+    private String name;
+
+    private String age;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher{" +
+                "name='" + name + '\'' +
+                ", age='" + age + '\'' +
+                '}';
+    }
+}
+
+```
+
+优化:可以实现一个基础配置引入类,然后其他配置类继承该类.
 
 ### SpringBoot集成Mybatis
+
+```java
+<dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- druid数据源 -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.1.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+```
+
+
 
 ### SpringBoot事务支持
 
