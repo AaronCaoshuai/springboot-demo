@@ -13,5 +13,7 @@
         <module>springboot-basic1</module>
         <module>springboot-actuator</module>
         <module>springboot-envs</module>
+        <module>springboot-ssm</module>
+        <module>springboot-generator</module>
     </modules>
 </project>

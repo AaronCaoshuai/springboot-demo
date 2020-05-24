@@ -1,0 +1,8 @@
+server:
+  port: 8002
+  servlet:
+    context-path: /uat
+
+spring:
+  profiles: uat
+
